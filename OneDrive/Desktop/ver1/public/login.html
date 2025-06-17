@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Express - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            color: #1a2a6c;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1a2a6c;
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 42, 108, 0.2);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #666;
+        }
+
+        .register-link a {
+            color: #1a2a6c;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: #b21f1f;
+        }
+
+        .error-message {
+            color: #b21f1f;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+            padding: 0.8rem;
+            background: rgba(178, 31, 31, 0.1);
+            border-radius: 8px;
+        }
+
+        .user-type-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-type-option {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-type-option:hover {
+            border-color: #1a2a6c;
+        }
+
+        .user-type-option.selected {
+            background: #1a2a6c;
+            color: white;
+            border-color: #1a2a6c;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>Fuel Express</h1>
+            <p>Your Trusted Fuel Delivery Partner</p>
+        </div>
+        <form id="loginForm">
+            <div class="user-type-selector">
+                <div class="user-type-option selected" data-type="customer">Customer</div>
+                <div class="user-type-option" data-type="dealer">Dealer</div>
+                <div class="user-type-option" data-type="delivery_boy">Delivery Boy</div>
+            </div>
+            <input type="hidden" id="userType" name="userType" value="customer">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit">Sign In</button>
+            <div class="error-message" id="errorMessage"></div>
+        </form>
+        <div class="register-link">
+            New to Fuel Express? <a href="/register">Create an account</a>
+        </div>
+    </div>
+
+    <script>
+        // User type selection
+        const userTypeOptions = document.querySelectorAll('.user-type-option');
+        const userTypeInput = document.getElementById('userType');
+
+        userTypeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                userTypeOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                userTypeInput.value = option.dataset.type;
+            });
+        });
+
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                userType: userTypeInput.value
+            };
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Redirect based on user type
+                    switch(formData.userType) {
+                        case 'customer':
+                            window.location.href = '/customer-dashboard.html';
+                            break;
+                        case 'dealer':
+                            window.location.href = '/dealer-dashboard.html';
+                            break;
+                        case 'delivery_boy':
+                            window.location.href = '/delivery-dashboard.html';
+                            break;
+                    }
+                } else {
+                    const errorMessage = document.getElementById('errorMessage');
+                    errorMessage.textContent = data.message;
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html> 

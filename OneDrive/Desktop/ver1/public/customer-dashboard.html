@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Express - Customer Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a2a6c 0%, #b21f1f 100%);
+            color: white;
+            padding: 2rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .nav-item {
+            padding: 1rem 1.5rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #1a2a6c;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1a2a6c;
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 42, 108, 0.2);
+        }
+
+        .success-message {
+            color: #2ecc71;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .error-message {
+            color: #b21f1f;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(178, 31, 31, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .order-card {
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .order-card h3 {
+            color: #1a2a6c;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-accepted { background: #cce5ff; color: #004085; }
+        .status-in-progress { background: #d4edda; color: #155724; }
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .station-card {
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .station-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .station-card.selected {
+            border: 2px solid #1a2a6c;
+            background: #f8f9fa;
+        }
+
+        .price-info {
+            color: #1a2a6c;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .status-timeline {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding: 1rem 0;
+        }
+
+        .timeline-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .timeline-step:not(:last-child):after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: #e1e1e1;
+            z-index: 1;
+        }
+
+        .timeline-step.completed:after {
+            background: #2ecc71;
+        }
+
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e1e1e1;
+            margin: 0 auto;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .timeline-step.completed .step-icon {
+            background: #2ecc71;
+        }
+
+        .timeline-step.active .step-icon {
+            background: #1a2a6c;
+        }
+
+        .step-text {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .timeline-step.completed .step-text {
+            color: #2ecc71;
+            font-weight: 500;
+        }
+
+        .timeline-step.active .step-text {
+            color: #1a2a6c;
+            font-weight: 500;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .dashboard {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Fuel Express</h2>
+                <p>Customer Dashboard</p>
+            </div>
+            <div class="nav-item active" onclick="showSection('fuel-request')">
+                <i class="fas fa-gas-pump"></i>
+                Request Fuel
+            </div>
+            <div class="nav-item" onclick="showSection('order-history')">
+                <i class="fas fa-history"></i>
+                Order History
+            </div>
+            <div class="nav-item" onclick="showSection('profile')">
+                <i class="fas fa-user"></i>
+                Profile
+            </div>
+            <div class="nav-item" onclick="showSection('feedback')">
+                <i class="fas fa-comment"></i>
+                Feedback
+            </div>
+            <div class="nav-item" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Fuel Request Section -->
+            <div id="fuel-request" class="section active">
+                <div class="card">
+                    <h2>Request Fuel Delivery</h2>
+                    <form id="fuelRequestForm">
+                        <div class="form-group">
+                            <label for="fuelType">Fuel Type</label>
+                            <select id="fuelType" required onchange="updatePrice()">
+                                <option value="">Select Fuel Type</option>
+                                <option value="petrol">Petrol</option>
+                                <option value="diesel">Diesel</option>
+                                <option value="cng">CNG</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity (Liters/Kg)</label>
+                            <input type="number" id="quantity" step="0.01" required onchange="updatePrice()">
+                        </div>
+                        <div class="form-group">
+                            <label for="deliveryAddress">Delivery Address</label>
+                            <input type="text" id="deliveryAddress" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nearest Fuel Stations</label>
+                            <div id="nearestStations">
+                                <!-- Stations will be populated here -->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Total Amount</label>
+                            <div id="totalAmount" style="font-size: 24px; color: #1a2a6c; font-weight: bold;">₹0.00</div>
+                        </div>
+                        <button type="submit">Place Order</button>
+                        <div class="success-message" id="successMessage"></div>
+                        <div class="error-message" id="errorMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Order History Section -->
+            <div id="order-history" class="section">
+                <div class="card">
+                    <h2>Order History</h2>
+                    <div id="orderHistoryList">
+                        <!-- Orders will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="profile" class="section">
+                <div class="card">
+                    <h2>Profile Information</h2>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="profileName">Full Name</label>
+                            <input type="text" id="profileName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail">Email</label>
+                            <input type="email" id="profileEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profilePhone">Phone Number</label>
+                            <input type="tel" id="profilePhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileAddress">Address</label>
+                            <input type="text" id="profileAddress" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileCity">City</label>
+                            <input type="text" id="profileCity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileState">State</label>
+                            <input type="text" id="profileState" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profilePincode">Pincode</label>
+                            <input type="text" id="profilePincode" required>
+                        </div>
+                        <button type="submit">Update Profile</button>
+                        <div class="success-message" id="profileSuccessMessage"></div>
+                        <div class="error-message" id="profileErrorMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div id="feedback" class="section">
+                <div class="card">
+                    <h2>Send Feedback</h2>
+                    <form id="feedbackForm">
+                        <div class="form-group">
+                            <label for="feedbackType">Feedback Type</label>
+                            <select id="feedbackType" required>
+                                <option value="">Select Feedback Type</option>
+                                <option value="suggestion">Suggestion</option>
+                                <option value="complaint">Complaint</option>
+                                <option value="praise">Praise</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="feedbackMessage">Message</label>
+                            <textarea id="feedbackMessage" rows="4" required style="width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; background: #f8f9fa;"></textarea>
+                        </div>
+                        <button type="submit">Submit Feedback</button>
+                        <div class="success-message" id="feedbackSuccessMessage"></div>
+                        <div class="error-message" id="feedbackErrorMessage"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let selectedStationId = null;
+        let allStations = [];
+
+        // Show/hide sections
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            // Find the navigation item corresponding to the sectionId and add the active class
+            const navItem = document.querySelector(`.nav-item[onclick*="showSection('${sectionId}')"]`);
+            if (navItem) {
+                navItem.classList.add('active');
+            }
+
+            if (sectionId === 'order-history') {
+                loadOrderHistory();
+            } else if (sectionId === 'profile') {
+                loadProfile();
+            } else if (sectionId === 'fuel-request') {
+                // Do not load all stations here, wait for address input
+                const nearestStationsContainer = document.getElementById('nearestStations');
+                nearestStationsContainer.innerHTML = '<p style="color: #666;">Enter your delivery address to find nearby stations.</p>';
+                allStations = [];
+                selectedStationId = null;
+                updatePrice();
+            } else if (sectionId === 'feedback') {
+                // No initial loading needed for feedback submission
+            }
+        }
+
+        // Load all fuel stations
+        async function loadFuelStations() {
+            const container = document.getElementById('nearestStations');
+            container.innerHTML = '<p>Loading fuel stations...</p>'; // Add loading message
+            allStations = []; // Clear previous stations
+            selectedStationId = null; // Clear selected station
+            document.getElementById('totalAmount').textContent = '₹0.00'; // Reset total
+
+            try {
+                const response = await fetch('/api/get-all-stations');
+                const data = await response.json();
+
+                if (data.success) {
+                    allStations = data.stations; // Store all stations globally
+                    displayAvailableStations(allStations);
+                } else {
+                    console.error('Failed to load fuel stations:', data.message);
+                    container.innerHTML = '<p style="color: red;">Failed to load fuel stations.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading fuel stations:', error);
+                container.innerHTML = '<p style="color: red;">Error loading fuel stations.</p>';
+            }
+        }
+
+        // Display available stations
+        function displayAvailableStations(stations) {
+            const container = document.getElementById('nearestStations');
+            container.innerHTML = '';
+
+            if (stations.length === 0) {
+                container.innerHTML = '<p style="color: #666;">No fuel stations available for this address.</p>';
+                return;
+            }
+
+            stations.forEach(station => {
+                const stationCard = document.createElement('div');
+                stationCard.className = 'station-card';
+                stationCard.dataset.stationId = station.id; // Store station ID in data attribute
+                stationCard.innerHTML = `
+                    <h3>${station.name}</h3>
+                    <p>${station.address}, ${station.city}</p>
+                    <p>Contact: ${station.dealer_phone || 'N/A'}</p>
+                    <p class="price-info">Petrol: ₹${station.petrol_price || 'N/A'}/L</p>
+                    <p class="price-info">Diesel: ₹${station.diesel_price || 'N/A'}/L</p>
+                    <p class="price-info">CNG: ₹${station.cng_price || 'N/A'}/Kg</p>
+                `;
+                stationCard.onclick = () => selectStation(station.id);
+                container.appendChild(stationCard);
+            });
+        }
+
+        // Select a station
+        function selectStation(stationId) {
+            document.querySelectorAll('.station-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            const selectedCard = document.querySelector(`.station-card[data-station-id="${stationId}"]`);
+            if (selectedCard) {
+                 selectedCard.classList.add('selected');
+                 selectedStationId = stationId;
+                 updatePrice(); // Recalculate total when station is selected
+            }
+        }
+
+        // Update total price based on fuel type and quantity
+        function updatePrice() {
+            const fuelType = document.getElementById('fuelType').value;
+            const quantity = parseFloat(document.getElementById('quantity').value);
+            const totalAmountDiv = document.getElementById('totalAmount');
+
+            if (fuelType && quantity > 0 && selectedStationId !== null) {
+                 const selectedStation = allStations.find(station => station.id === selectedStationId);
+                 if (selectedStation) {
+                     const price = selectedStation[`${fuelType}_price`];
+                     if (price !== undefined && price !== null && !isNaN(price)) {
+                          const total = price * quantity;
+                          totalAmountDiv.textContent = `₹${total.toFixed(2)}`;
+                     } else {
+                          totalAmountDiv.textContent = 'Price not available';
+                     }
+                 } else {
+                     totalAmountDiv.textContent = '₹0.00';
+                 }
+            } else {
+                totalAmountDiv.textContent = '₹0.00';
+            }
+        }
+
+        // Load customer order history
+        async function loadOrderHistory() {
+            const ordersList = document.getElementById('orderHistoryList');
+            ordersList.innerHTML = '<p>Loading order history...</p>';
+
+            try {
+                const response = await fetch('/api/customer/get-orders');
+                const data = await response.json();
+
+                ordersList.innerHTML = ''; // Clear loading message
+
+                if (data.success && data.orders.length > 0) {
+                    data.orders.forEach(order => {
+                        const orderCard = document.createElement('div');
+                        orderCard.className = 'order-card';
+
+                        // Determine which steps are completed/active
+                        const isConfirmed = order.status !== 'pending'; // Any status after pending means confirmed by dealer
+                        const isInProgress = order.status === 'in-progress' || order.status === 'delivered';
+                        const isDelivered = order.status === 'delivered';
+
+                        orderCard.innerHTML = `
+                            <h3>Order #${order.id} - ${order.station_name}</h3>
+                            <div class="order-details">
+                                <div>
+                                    <strong>Fuel Type:</strong> ${order.fuel_type}
+                                </div>
+                                <div>
+                                    <strong>Quantity:</strong> ${order.quantity} L
+                                </div>
+                                <div>
+                                    <strong>Amount:</strong> ₹${order.total_amount}
+                                </div>
+                                <div>
+                                    <strong>Delivery Address:</strong> ${order.delivery_address}
+                                </div>
+                                <div>
+                                    <strong>Status:</strong> <span class="order-status status-${order.status}">${order.status.replace('_', ' ').toUpperCase()}</span>
+                                </div>
+                                ${order.delivery_boy_name ? `
+                                <div>
+                                    <strong>Delivery Boy:</strong> ${order.delivery_boy_name} ${order.delivery_boy_phone ? `(${order.delivery_boy_phone})` : ''}
+                                </div>
+                                ` : ''}
+                            </div>
+
+                            <div class="status-timeline">
+                                <div class="timeline-step ${isConfirmed ? 'completed' : ''} ${order.status === 'accepted' ? 'active' : ''}">
+                                    <div class="step-icon"></div>
+                                    <div class="step-text">Order Confirmed</div>
+                                </div>
+                                <div class="timeline-step ${isInProgress ? 'completed' : ''} ${order.status === 'in-progress' ? 'active' : ''}">
+                                    <div class="step-icon"></div>
+                                    <div class="step-text">In Progress</div>
+                                </div>
+                                <div class="timeline-step ${isDelivered ? 'completed' : ''} ${order.status === 'delivered' ? 'active' : ''}">
+                                    <div class="step-icon"></div>
+                                    <div class="step-text">Delivered</div>
+                                </div>
+                            </div>
+
+                            <div class="actions">
+                                ${order.status === 'pending' ? `<button onclick="cancelOrder(${order.id})">Cancel Order</button>` : ''}
+                            </div>
+                        `;
+                        ordersList.appendChild(orderCard);
+                    });
+                } else {
+                    ordersList.innerHTML = '<p>No order history found.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading order history:', error);
+                ordersList.innerHTML = '<p>Error loading order history.</p>';
+            }
+        }
+
+        // Cancel order (Customer)
+        async function cancelOrder(orderId) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                try {
+                    const response = await fetch('/api/customer/cancel-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        alert(data.message);
+                        loadOrderHistory(); // Refresh order history
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error cancelling order:', error);
+                    alert('An error occurred while cancelling the order.');
+                }
+            }
+        }
+
+        // Load profile
+        async function loadProfile() {
+            const profileForm = document.getElementById('profileForm');
+            const profileSuccess = document.getElementById('profileSuccessMessage');
+            const profileError = document.getElementById('profileErrorMessage');
+            // Show loading state (optional)
+
+            try {
+                const response = await fetch('/api/customer/profile');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('profileName').value = data.profile.name;
+                    document.getElementById('profileEmail').value = data.profile.email;
+                    document.getElementById('profilePhone').value = data.profile.phone;
+                    document.getElementById('profileAddress').value = data.profile.address;
+                    // Assuming city, state, pincode are also part of the form based on registration
+                    document.getElementById('profileCity').value = data.profile.city;
+                    document.getElementById('profileState').value = data.profile.state;
+                    document.getElementById('profilePincode').value = data.profile.pincode;
+
+                } else {
+                    console.error('Failed to load profile:', data.message);
+                    profileError.textContent = data.message;
+                    profileError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                profileError.textContent = 'An error occurred while loading profile.';
+                profileError.style.display = 'block';
+            } finally {
+                // Hide loading state (optional)
+            }
+        }
+
+        // Handle profile update
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                name: document.getElementById('profileName').value,
+                phone: document.getElementById('profilePhone').value,
+                address: document.getElementById('profileAddress').value,
+                city: document.getElementById('profileCity').value,
+                state: document.getElementById('profileState').value,
+                pincode: document.getElementById('profilePincode').value
+            };
+
+            const profileSuccess = document.getElementById('profileSuccessMessage');
+            const profileError = document.getElementById('profileErrorMessage');
+            profileSuccess.style.display = 'none';
+            profileError.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/customer/update-profile', {
+                    method: 'PUT', // Using PUT for updates
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    profileSuccess.textContent = data.message;
+                    profileSuccess.style.display = 'block';
+                } else {
+                    profileError.textContent = data.message;
+                    profileError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                profileError.textContent = 'An error occurred while updating profile. Please try again.';
+                profileError.style.display = 'block';
+            }
+        });
+
+        // Handle fuel type or quantity change to update price
+        document.getElementById('fuelType').addEventListener('change', updatePrice);
+        document.getElementById('quantity').addEventListener('input', updatePrice);
+
+        // Handle fuel request form submission
+        document.getElementById('fuelRequestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fuelType = document.getElementById('fuelType').value;
+            const quantity = parseFloat(document.getElementById('quantity').value);
+            const deliveryAddress = document.getElementById('deliveryAddress').value;
+
+            const requestSuccess = document.getElementById('successMessage');
+            const requestError = document.getElementById('errorMessage');
+            requestSuccess.style.display = 'none';
+            requestError.style.display = 'none';
+
+            if (!selectedStationId) {
+                requestError.textContent = 'Please select a fuel station.';
+                requestError.style.display = 'block';
+                return;
+            }
+
+            if (!fuelType || quantity <= 0 || !deliveryAddress) {
+                requestError.textContent = 'Please fill in all required fields correctly.';
+                requestError.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/place-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fuelType, quantity, deliveryAddress, stationId: selectedStationId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    requestSuccess.textContent = data.message;
+                    requestSuccess.style.display = 'block';
+                    // Clear the form after successful submission (optional)
+                    document.getElementById('fuelRequestForm').reset();
+                    document.getElementById('totalAmount').textContent = '₹0.00';
+                    selectedStationId = null;
+                    document.querySelectorAll('.station-card').forEach(card => card.classList.remove('selected'));
+
+                } else {
+                    requestError.textContent = data.message;
+                    requestError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error placing order:', error);
+                requestError.textContent = 'An error occurred while placing your order. Please try again.';
+                requestError.style.display = 'block';
+            }
+        });
+
+        // Handle feedback form submission
+        document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const feedbackType = document.getElementById('feedbackType').value;
+            const feedbackMessageElement = document.getElementById('feedbackMessage');
+            const feedbackMessage = feedbackMessageElement.value.trim();
+
+            const feedbackSuccess = document.getElementById('feedbackSuccessMessage');
+            const feedbackError = document.getElementById('feedbackErrorMessage');
+            feedbackSuccess.style.display = 'none';
+            feedbackError.style.display = 'none';
+
+            // Corrected validation check:
+            if (!feedbackType || feedbackMessage === '') {
+                feedbackError.textContent = 'Please select a feedback type and enter a message.'; // More specific error message
+                feedbackError.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/customer/submit-feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ feedbackType, feedbackMessage })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    feedbackSuccess.textContent = data.message;
+                    feedbackSuccess.style.display = 'block';
+                    document.getElementById('feedbackForm').reset();
+                } else {
+                    feedbackError.textContent = data.message;
+                    feedbackError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                feedbackError.textContent = 'An error occurred while submitting feedback. Please try again.';
+                feedbackError.style.display = 'block';
+            }
+        });
+
+        // Logout function
+        async function logout() {
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST',
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Redirect to login page after successful logout
+                    window.location.href = '/';
+                } else {
+                    alert('Logout failed: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('An error occurred during logout.');
+            }
+        }
+
+        // Add event listener for delivery address input
+        document.getElementById('deliveryAddress').addEventListener('input', debounce(filterStationsByAddress, 500)); // Debounce to avoid excessive calls
+
+        // Filter stations based on delivery address
+        async function filterStationsByAddress() {
+            const deliveryAddressInput = document.getElementById('deliveryAddress').value;
+            const nearestStationsContainer = document.getElementById('nearestStations');
+
+            // Basic parsing of address - ideally, this would be more robust or use separate input fields
+            const addressParts = deliveryAddressInput.split(',').map(part => part.trim());
+            // Assuming format: Street, City, State, Pincode
+            if (addressParts.length < 4) {
+                nearestStationsContainer.innerHTML = '<p style="color: #666;">Enter full address (Street, City, State, Pincode) to find nearby stations.</p>';
+                allStations = []; // Clear stations when address is incomplete
+                selectedStationId = null;
+                updatePrice();
+                return;
+            }
+
+            const city = addressParts[1];
+            const state = addressParts[2];
+            const pincode = addressParts[3];
+
+            if (!city || !state || !pincode) {
+                 nearestStationsContainer.innerHTML = '<p style="color: #666;">Enter full address (Street, City, State, Pincode) to find nearby stations.</p>';
+                 allStations = [];
+                 selectedStationId = null;
+                 updatePrice();
+                 return;
+            }
+
+            nearestStationsContainer.innerHTML = '<p>Searching for stations...</p>';
+            allStations = []; // Clear previous stations
+            selectedStationId = null; // Clear selected station
+            updatePrice();
+
+            try {
+                const response = await fetch(`/api/get-stations-by-address?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&pincode=${encodeURIComponent(pincode)}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    allStations = data.stations;
+                    displayAvailableStations(allStations);
+                } else {
+                    console.error('Failed to filter fuel stations:', data.message);
+                    nearestStationsContainer.innerHTML = '<p style="color: red;">Failed to load fuel stations.</p>';
+                }
+            } catch (error) {
+                console.error('Error filtering fuel stations:', error);
+                nearestStationsContainer.innerHTML = '<p style="color: red;">Error loading fuel stations.</p>';
+            }
+        }
+
+        // Debounce function to limit how often filterStationsByAddress is called
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+
+        // Keep existing event listeners attached on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial load of the first section
+            showSection('fuel-request');
+        });
+
+        // Load analytics data (Note: This function seems intended for a dealer dashboard,
+        // but is included here as it was in the provided script block.
+        // It might not be called in the customer dashboard\'s current layout).
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/get-analytics');
+                const data = await response.json();
+
+                if (data.success) {
+                    // Assuming elements with these IDs exist in the HTML where analytics are displayed
+                    const todaySalesElement = document.getElementById('todaySales');
+                    const weekSalesElement = document.getElementById('weekSales');
+                    const monthSalesElement = document.getElementById('monthSales');
+
+                    if (todaySalesElement) todaySalesElement.textContent = `₹${data.today.toFixed(2)}`;
+                    if (weekSalesElement) weekSalesElement.textContent = `₹${data.week.toFixed(2)}`;
+                    if (monthSalesElement) monthSalesElement.textContent = `₹${data.month.toFixed(2)}`;
+
+                } else {
+                    console.error('Failed to load analytics:', data.message);
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+    </script>
+    
+</body>
+</html> 

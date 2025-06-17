@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Express - Dealer Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a2a6c 0%, #b21f1f 100%);
+            color: white;
+            padding: 2rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .nav-item {
+            padding: 1rem 1.5rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #1a2a6c;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1a2a6c;
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 42, 108, 0.2);
+        }
+
+        .success-message {
+            color: #2ecc71;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .error-message {
+            color: #b21f1f;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(178, 31, 31, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .price-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 2px solid #e1e1e1;
+            transition: all 0.3s ease;
+        }
+
+        .price-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .price-card h3 {
+            margin-bottom: 0.8rem;
+            color: #1a2a6c;
+            font-weight: 600;
+        }
+
+        .price-value {
+            font-size: 24px;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .success-message {
+            color: green;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .order-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+
+        .order-card h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .order-details > div {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .order-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .status-pending { background: #ffeeba; color: #856404; }
+        .status-accepted { background: #b8daff; color: #004085; }
+        .status-in-progress { background: #c3e6cb; color: #155724; }
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .actions button {
+            margin-right: 5px;
+        }
+
+        .delivery-boy-selection {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .delivery-boy-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .delivery-boy-stats {
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .delivery-boy-stats h4 {
+            margin: 0 0 5px 0;
+            color: #2c3e50;
+        }
+
+        .delivery-boy-stats p {
+            margin: 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <h2>Dealer Dashboard</h2>
+            <div class="nav-item active" onclick="showSection('station-management')">Station Management</div>
+            <div class="nav-item" onclick="showSection('price-management')">Price Management</div>
+            <div class="nav-item" onclick="showSection('orders')">Orders</div>
+            <div class="nav-item" onclick="showSection('profile')">Profile</div>
+            <div class="nav-item" onclick="showSection('feedback')">Feedback</div>
+            <div class="nav-item" onclick="logout()">Logout</div>
+        </div>
+
+        <div class="main-content">
+            <!-- Station Management Section -->
+            <div id="station-management" class="section">
+                <div class="card">
+                    <h2>Register Fuel Station</h2>
+                    <form id="stationRegistrationForm">
+                        <div class="form-group">
+                            <label for="stationName">Station Name</label>
+                            <input type="text" id="stationName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stationAddress">Address</label>
+                            <input type="text" id="stationAddress" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stationCity">City</label>
+                            <input type="text" id="stationCity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stationState">State</label>
+                            <input type="text" id="stationState" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stationPincode">Pincode</label>
+                            <input type="text" id="stationPincode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stationContact">Contact Number</label>
+                            <input type="tel" id="stationContact" required>
+                        </div>
+                        <button type="submit">Register Station</button>
+                        <div class="success-message" id="stationSuccess"></div>
+                        <div class="error-message" id="stationError"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Price Management Section -->
+            <div id="price-management" class="section" style="display: none;">
+                <div class="card">
+                    <h2>Update Fuel Prices</h2>
+                    <div class="form-group">
+                        <label for="selectStation">Select Station</label>
+                        <select id="selectStation" required onchange="loadCurrentPrices()">
+                            <option value="">-- Select a Station --</option>
+                            <!-- Stations will be populated here -->
+                        </select>
+                    </div>
+                    <form id="priceUpdateForm">
+                        <div class="form-group">
+                            <label for="petrolPrice">Petrol Price (₹/L)</label>
+                            <input type="number" id="petrolPrice" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dieselPrice">Diesel Price (₹/L)</label>
+                            <input type="number" id="dieselPrice" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cngPrice">CNG Price (₹/Kg)</label>
+                            <input type="number" id="cngPrice" step="0.01" required>
+                        </div>
+                        <button type="submit">Update Prices</button>
+                        <div class="success-message" id="priceSuccess"></div>
+                        <div class="error-message" id="priceError"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Orders Section -->
+            <div id="orders" class="section" style="display: none;">
+                <div class="card">
+                    <h2>Customer Orders</h2>
+                    <div id="ordersList">
+                        <!-- Orders will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics" class="section" style="display: none;">
+                <div class="card">
+                    <h2>Sales Analytics</h2>
+                    <div id="analyticsData">
+                        <p><strong>Today's Sales:</strong> <span id="todaySales">₹0.00</span></p>
+                        <p><strong>Last 7 Days Sales:</strong> <span id="weekSales">₹0.00</span></p>
+                        <p><strong>Last 30 Days Sales:</strong> <span id="monthSales">₹0.00</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="profile" class="section" style="display: none;">
+                <div class="card">
+                    <h2>Profile Information</h2>
+                    <form id="dealerProfileForm">
+                        <div class="form-group">
+                            <label for="dealerName">Full Name</label>
+                            <input type="text" id="dealerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dealerEmail">Email</label>
+                            <input type="email" id="dealerEmail" required readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="dealerPhone">Phone Number</label>
+                            <input type="tel" id="dealerPhone" required>
+                        </div>
+                        <button type="submit">Update Profile</button>
+                        <div class="success-message" id="dealerProfileSuccess"></div>
+                        <div class="error-message" id="dealerProfileError"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div id="feedback" class="section" style="display: none;">
+                <div class="card">
+                    <h2>Customer Feedback</h2>
+                    <div id="feedbackList">
+                        <!-- Feedback will be populated here -->
+                        <p>Loading feedback...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedStationId = null; // For price management
+
+        // Show selected section
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            if (sectionId === 'price-management') {
+                loadStationsForPriceManagement();
+            } else if (sectionId === 'orders') {
+                loadDealerOrders();
+            } else if (sectionId === 'profile') {
+                loadDealerProfile();
+            } else if (sectionId === 'feedback') {
+                loadFeedback(); // Load feedback when the section is shown
+            }
+        }
+
+        // Handle station registration
+        document.getElementById('stationRegistrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('stationName').value,
+                address: document.getElementById('stationAddress').value,
+                city: document.getElementById('stationCity').value,
+                state: document.getElementById('stationState').value,
+                pincode: document.getElementById('stationPincode').value,
+                contactNumber: document.getElementById('stationContact').value
+            };
+
+            try {
+                const response = await fetch('/api/register-station', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                const successMessage = document.getElementById('stationSuccess');
+                const errorMessage = document.getElementById('stationError');
+
+                if (data.success) {
+                    successMessage.textContent = data.message;
+                    successMessage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    document.getElementById('stationRegistrationForm').reset();
+                } else {
+                    errorMessage.textContent = data.message;
+                    errorMessage.style.display = 'block';
+                    successMessage.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('stationError').textContent = 'An error occurred. Please try again.';
+                document.getElementById('stationError').style.display = 'block';
+                document.getElementById('stationSuccess').style.display = 'none';
+            }
+        });
+
+        // Load stations for price management
+        async function loadStationsForPriceManagement() {
+            try {
+                const response = await fetch('/api/dealer/get-stations'); // Assuming a new endpoint for dealer stations
+                const data = await response.json();
+
+                const selectStationDropdown = document.getElementById('selectStation');
+                selectStationDropdown.innerHTML = '<option value="">-- Select a Station --</option>';
+
+                if (data.success && data.stations.length > 0) {
+                    data.stations.forEach(station => {
+                        const option = document.createElement('option');
+                        option.value = station.id;
+                        option.textContent = station.name;
+                        selectStationDropdown.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading stations:', error);
+            }
+        }
+
+        // Load current prices for selected station
+        async function loadCurrentPrices() {
+            selectedStationId = document.getElementById('selectStation').value;
+            if (!selectedStationId) {
+                document.getElementById('priceUpdateForm').reset();
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/get-prices?stationId=${selectedStationId}`); // Assuming stationId query parameter
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('petrolPrice').value = data.prices.petrol;
+                    document.getElementById('dieselPrice').value = data.prices.diesel;
+                    document.getElementById('cngPrice').value = data.prices.cng;
+                }
+            } catch (error) {
+                console.error('Error loading prices:', error);
+            }
+        }
+
+        // Handle price update
+        document.getElementById('priceUpdateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!selectedStationId) {
+                alert('Please select a station first.');
+                return;
+            }
+
+            const formData = {
+                stationId: selectedStationId,
+                petrol: document.getElementById('petrolPrice').value,
+                diesel: document.getElementById('dieselPrice').value,
+                cng: document.getElementById('cngPrice').value,
+            };
+
+            try {
+                const response = await fetch('/api/update-prices', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                const successMessage = document.getElementById('priceSuccess');
+                const errorMessage = document.getElementById('priceError');
+
+                if (data.success) {
+                    successMessage.textContent = data.message;
+                    successMessage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                } else {
+                    errorMessage.textContent = data.message;
+                    errorMessage.style.display = 'block';
+                    successMessage.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('priceError').textContent = 'An error occurred. Please try again.';
+                document.getElementById('priceError').style.display = 'block';
+                document.getElementById('priceSuccess').style.display = 'none';
+            }
+        });
+
+        // Load analytics data
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/get-analytics');
+                const data = await response.json();
+
+                if (data.success) {
+                    // Ensure values are numbers before calling toFixed
+                    const todaySales = typeof data.today === 'number' ? data.today : 0;
+                    const weekSales = typeof data.week === 'number' ? data.week : 0;
+                    const monthSales = typeof data.month === 'number' ? data.month : 0;
+
+                    document.getElementById('todaySales').textContent = `₹${todaySales.toFixed(2)}`;
+                    document.getElementById('weekSales').textContent = `₹${weekSales.toFixed(2)}`;
+                    document.getElementById('monthSales').textContent = `₹${monthSales.toFixed(2)}`;
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        // Load dealer orders
+        async function loadDealerOrders() {
+            try {
+                const response = await fetch('/api/dealer/get-orders');
+                const data = await response.json();
+
+                const ordersList = document.getElementById('ordersList');
+                ordersList.innerHTML = '';
+
+                if (data.success && data.orders.length > 0) {
+                    data.orders.forEach(order => {
+                        const orderCard = document.createElement('div');
+                        orderCard.className = 'order-card';
+                        orderCard.innerHTML = `
+                            <h3>Order #${order.id} - ${order.station_name}</h3>
+                            <div class="order-details">
+                                <div>
+                                    <strong>Customer:</strong> ${order.customer_name}
+                                </div>
+                                <div>
+                                    <strong>Fuel Type:</strong> ${order.fuel_type}
+                                </div>
+                                <div>
+                                    <strong>Quantity:</strong> ${order.quantity} L
+                                </div>
+                                <div>
+                                    <strong>Amount:</strong> ₹${order.total_amount}
+                                </div>
+                                <div>
+                                    <strong>Delivery Address:</strong> ${order.delivery_address}
+                                </div>
+                                <div>
+                                    <strong>Status:</strong> <span class="order-status status-${order.status}">${order.status.replace('_', ' ').toUpperCase()}</span>
+                                </div>
+                                ${order.delivery_boy_name ? `<div><strong>Delivery Boy:</strong> ${order.delivery_boy_name}</div>` : ''}
+                            </div>
+                            <div class="actions">
+                                ${order.status === 'pending' ? `
+                                    <button onclick="acceptOrder(${order.id})">Accept</button>
+                                    <button onclick="rejectOrder(${order.id})">Reject</button>
+                                ` : ''}
+                                ${order.status === 'accepted' && !order.delivery_boy_id ? `
+                                    <button onclick="showDeliveryBoySelection(${order.id}, this)">Assign Delivery Boy</button>
+                                    <span id="delivery-boy-selection-${order.id}" style="margin-left: 10px;"></span>
+                                ` : ''}
+                            </div>
+                        `;
+                        ordersList.appendChild(orderCard);
+                    });
+                } else {
+                    ordersList.innerHTML = '<p>No orders found.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading dealer orders:', error);
+                document.getElementById('ordersList').innerHTML = '<p>Error loading orders.</p>';
+            }
+        }
+
+        // Placeholder functions for order actions
+        async function acceptOrder(orderId) {
+            if (confirm('Are you sure you want to accept order #' + orderId + '?')) {
+                try {
+                    const response = await fetch('/api/dealer/accept-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId: orderId })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        alert(data.message);
+                        loadDealerOrders(); // Refresh the orders list
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error accepting order:', error);
+                    alert('An error occurred while accepting the order.');
+                }
+            }
+        }
+
+        async function rejectOrder(orderId) {
+            if (confirm('Are you sure you want to reject order #' + orderId + '?')) {
+                try {
+                    const response = await fetch('/api/dealer/reject-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId: orderId })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        alert(data.message);
+                        loadDealerOrders(); // Refresh the orders list
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error rejecting order:', error);
+                    alert('An error occurred while rejecting the order.');
+                }
+            }
+        }
+
+        // Show delivery boy selection for an order
+        async function showDeliveryBoySelection(orderId, buttonElement) {
+            const selectionSpan = document.getElementById(`delivery-boy-selection-${orderId}`);
+            selectionSpan.innerHTML = '<p>Loading delivery boys...</p>'; // Loading message
+
+            try {
+                const response = await fetch('/api/dealer/get-delivery-boys');
+                const data = await response.json();
+
+                console.log('Response from /api/dealer/get-delivery-boys:', data);
+
+                selectionSpan.innerHTML = ''; // Clear loading message
+
+                if (data.success && data.deliveryBoys.length > 0) {
+                    const selectionDiv = document.createElement('div');
+                    selectionDiv.className = 'delivery-boy-selection';
+
+                    const selectElement = document.createElement('select');
+                    selectElement.innerHTML = '<option value="">Select Delivery Boy</option>';
+                    data.deliveryBoys.forEach(db => {
+                        const option = document.createElement('option');
+                        option.value = db.id;
+                        option.textContent = db.name;
+                        selectElement.appendChild(option);
+                    });
+
+                    const assignButton = document.createElement('button');
+                    assignButton.textContent = 'Assign';
+                    assignButton.onclick = () => {
+                        const selectedId = selectElement.value;
+                        if (selectedId) {
+                            showDeliveryBoyDetails(selectedId, orderId);
+                        } else {
+                            alert('Please select a delivery boy.');
+                        }
+                    };
+
+                    selectionDiv.appendChild(selectElement);
+                    selectionDiv.appendChild(assignButton);
+                    selectionSpan.appendChild(selectionDiv);
+
+                    // Hide the original "Assign Delivery Boy" button
+                    buttonElement.style.display = 'none';
+                } else {
+                    selectionSpan.innerHTML = '<p>No delivery boys available.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching delivery boys:', error);
+                selectionSpan.innerHTML = '<p style="color: red;">Failed to load delivery boys.</p>';
+            }
+        }
+
+        // Show delivery boy details and history
+        async function showDeliveryBoyDetails(deliveryBoyId, orderId) {
+            try {
+                const response = await fetch(`/api/dealer/get-delivery-boy-details/${deliveryBoyId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const selectionSpan = document.getElementById(`delivery-boy-selection-${orderId}`);
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.className = 'delivery-boy-info';
+
+                    // Delivery boy personal info
+                    detailsDiv.innerHTML = `
+                        <div class="delivery-boy-stats">
+                            <h4>Personal Information</h4>
+                            <p><strong>Name:</strong> ${data.deliveryBoy.name}</p>
+                            <p><strong>Phone:</strong> ${data.deliveryBoy.phone}</p>
+                            <p><strong>Email:</strong> ${data.deliveryBoy.email}</p>
+                        </div>
+                        <div class="delivery-boy-stats">
+                            <h4>Performance Statistics</h4>
+                            <p><strong>Total Deliveries:</strong> ${data.stats.totalDeliveries}</p>
+                            <p><strong>Completed Deliveries:</strong> ${data.stats.completedDeliveries}</p>
+                            <p><strong>Success Rate:</strong> ${data.stats.successRate}%</p>
+                        </div>
+                        <div class="delivery-boy-stats">
+                            <h4>Recent Activity</h4>
+                            <p><strong>Last Delivery:</strong> ${data.stats.lastDelivery || 'N/A'}</p>
+                            <p><strong>Active Orders:</strong> ${data.stats.activeOrders}</p>
+                        </div>
+                    `;
+
+                    const confirmButton = document.createElement('button');
+                    confirmButton.textContent = 'Confirm Assignment';
+                    confirmButton.onclick = () => assignDeliveryBoy(orderId, deliveryBoyId);
+
+                    const cancelButton = document.createElement('button');
+                    cancelButton.textContent = 'Cancel';
+                    cancelButton.style.background = '#e74c3c';
+                    cancelButton.onclick = () => {
+                        selectionSpan.innerHTML = '';
+                        document.querySelector(`button[onclick="showDeliveryBoySelection(${orderId}, this)"]`).style.display = 'inline-block';
+                    };
+
+                    const buttonDiv = document.createElement('div');
+                    buttonDiv.style.marginTop = '10px';
+                    buttonDiv.appendChild(confirmButton);
+                    buttonDiv.appendChild(cancelButton);
+
+                    selectionSpan.appendChild(detailsDiv);
+                    selectionSpan.appendChild(buttonDiv);
+                } else {
+                    alert('Failed to load delivery boy details.');
+                }
+            } catch (error) {
+                console.error('Error fetching delivery boy details:', error);
+                alert('An error occurred while loading delivery boy details.');
+            }
+        }
+
+        // Assign delivery boy to order
+        async function assignDeliveryBoy(orderId, deliveryBoyId) {
+            if (!deliveryBoyId) {
+                alert('Please select a delivery boy.');
+                return;
+            }
+
+            if (confirm('Assign delivery boy to order #' + orderId + '?')) {
+                try {
+                    const response = await fetch('/api/dealer/assign-delivery-boy', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId: orderId, deliveryBoyId: parseInt(deliveryBoyId) }) // Ensure ID is integer
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        alert(data.message);
+                        loadDealerOrders(); // Refresh the orders list
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error assigning delivery boy:', error);
+                    alert('An error occurred while assigning the delivery boy.');
+                }
+            }
+        }
+
+        // Load dealer profile
+        async function loadDealerProfile() {
+            const profileSuccess = document.getElementById('dealerProfileSuccess');
+            const profileError = document.getElementById('dealerProfileError');
+            profileSuccess.style.display = 'none';
+            profileError.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/dealer/profile');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('dealerName').value = data.profile.name;
+                    document.getElementById('dealerEmail').value = data.profile.email;
+                    document.getElementById('dealerPhone').value = data.profile.phone;
+                } else {
+                    console.error('Failed to load dealer profile:', data.message);
+                    profileError.textContent = data.message;
+                    profileError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading dealer profile:', error);
+                profileError.textContent = 'An error occurred while loading profile.';
+                profileError.style.display = 'block';
+            }
+        }
+
+        // Handle dealer profile update
+        document.getElementById('dealerProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('dealerName').value,
+                phone: document.getElementById('dealerPhone').value
+                // Email is read-only, no need to send for update
+            };
+
+            const profileSuccess = document.getElementById('dealerProfileSuccess');
+            const profileError = document.getElementById('dealerProfileError');
+            profileSuccess.style.display = 'none';
+            profileError.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/dealer/update-profile', {
+                    method: 'PUT', // Using PUT for updates
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    profileSuccess.textContent = data.message;
+                    profileSuccess.style.display = 'block';
+                } else {
+                    profileError.textContent = data.message;
+                    profileError.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error updating dealer profile:', error);
+                profileError.textContent = 'An error occurred while updating profile. Please try again.';
+                profileError.style.display = 'block';
+            }
+        });
+
+        // Load feedback for dealer
+        async function loadFeedback() {
+            const feedbackList = document.getElementById('feedbackList');
+            feedbackList.innerHTML = '<p>Loading feedback...</p>';
+
+            try {
+                const response = await fetch('/api/dealer/get-feedback');
+                const data = await response.json();
+
+                feedbackList.innerHTML = ''; // Clear loading message
+
+                if (data.success && data.feedback.length > 0) {
+                    data.feedback.forEach(item => {
+                        const feedbackCard = document.createElement('div');
+                        feedbackCard.className = 'card'; // Reuse card style for individual feedback entries
+                        feedbackCard.innerHTML = `
+                            <h4>Feedback from ${item.customer_name || 'Anonymous'}</h4>
+                            <p>${item.feedback_text}</p>
+                            <p style="font-size: 0.8em; color: #666; margin-top: 10px;">Submitted on: ${new Date(item.created_at).toLocaleString()}</p>
+                        `;
+                        feedbackList.appendChild(feedbackCard);
+                    });
+                } else {
+                    feedbackList.innerHTML = '<p>No feedback received yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading feedback:', error);
+                feedbackList.innerHTML = '<p style="color: red;">Failed to load feedback.</p>';
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST',
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Redirect to login page after successful logout
+                    window.location.href = '/';
+                } else {
+                    alert('Logout failed: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('An error occurred during logout.');
+            }
+        }
+
+        // Initial load
+        loadDealerOrders(); // Load orders by default
+    </script>
+</body>
+</html> 
